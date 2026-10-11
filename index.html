@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="es">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <title>
+   Almacén General | Control de cargas
+  </title>
+  <style>/* PERSONALIZACIÓN: modifica aquí colores, tipografía, tamaños y diseño. */
+
+:root {
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  color:#18263c;
+  background:#f5f7fb;
+  font-size:13px}
+* {
+  box-sizing:border-box}
+body {
+  margin:0}
+header {
+  background:white;
+  border-bottom:1px solid #e1e6ef;
+  padding:16px 24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap}
+h1 {
+  font-size:20px;
+  margin:0}
+h2 {
+  font-size:15px;
+  margin:0 0 8px}
+p {
+  color:#64748b;
+  margin:5px 0}
+.wrap {
+  max-width:1900px;
+  margin:auto;
+  padding:18px 22px}
+.hero {
+  background:white;
+  border:1px solid #e0e6ee;
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:13px}
+.search {
+  width:100%;
+  padding:15px 16px;
+  border:2px solid #c9d8ed;
+  border-radius:10px;
+  font-size:17px;
+  outline:none}
+.search:focus {
+  border-color:#3677da}
+.toolbar {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:12px;
+  align-items:center}
+button,select {
+  border:1px solid #d7dfe9;
+  background:white;
+  color:#27364c;
+  border-radius:8px;
+  padding:9px 11px;
+  cursor:pointer;
+  font:inherit}
+button:hover {
+  border-color:#6b9cde}
+.primary {
+  background:#2563eb;
+  color:white;
+  border-color:#2563eb}
+.active {
+  background:#e9f1ff;
+  border-color:#8ab4fa;
+  color:#184d9b}
+select {
+  max-width:220px}
+.meta {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin:14px 0 10px;
+  color:#475569}
+.tablebox {
+  border:1px solid #e0e6ee;
+  border-radius:12px;
+  background:white;
+  overflow:hidden}
+table {
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed}
+th {
+  background:#f0f4f9;
+  color:#46566c;
+  text-align:left;
+  font-size:11px;
+  letter-spacing:.015em;
+  padding:11px 7px;
+  position:sticky;
+  top:0;
+  z-index:1}
+td {
+  padding:10px 7px;
+  border-top:1px solid #e9edf3;
+  vertical-align:top;
+  font-size:12px;
+  overflow-wrap:anywhere;
+  line-height:1.4}
+tbody tr {
+  cursor:pointer}
+tbody tr:hover {
+  background:#f0f6ff!important}
+.scroll {
+  max-height:69vh;
+  overflow-y:auto}
+.color {
+  width:9px;
+  height:26px;
+  border-radius:4px;
+  border:1px solid #d5dae3;
+  display:inline-block}
+.desc {
+  font-weight:550}
+.muted {
+  color:#64748b}
+.code {
+  font-weight:700;
+  color:#214b82}
+.small {
+  font-size:11px}
+.empty {
+  padding:36px;
+  text-align:center;
+  color:#64748b}
+.foot {
+  padding:12px;
+  color:#64748b;
+  text-align:center;
+  border-top:1px solid #e8edf4}
+.modalbg {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:#17243c8c;
+  z-index:5;
+  align-items:center;
+  justify-content:center;
+  padding:20px}
+.modal {
+  background:white;
+  border-radius:16px;
+  width:min(850px,100%);
+  max-height:90vh;
+  overflow:auto;
+  padding:24px;
+  box-shadow:0 20px 60px #17243c55}
+.detailgrid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px}
+.detailcell {
+  padding:10px;
+  border:1px solid #e4eaf2;
+  border-radius:8px;
+  overflow-wrap:anywhere}
+.detailcell strong {
+  display:block;
+  font-size:11px;
+  color:#64748b;
+  margin-bottom:5px}
+.chip {
+  display:inline-flex;
+  gap:6px;
+  align-items:center}
+.dot {
+  width:12px;
+  height:12px;
+  border:1px solid #d4d9e0;
+  border-radius:3px}
+.notice {
+  font-size:12px;
+  color:#64748b}
+.hide {
+  display:none}
+@media(max-width:1100px) {
+  .wrap {
+  padding:12px}
+.scroll {
+  max-height:70vh}
+th,td {
+  font-size:10px;
+  padding:7px 4px}
+}
+@media(max-width:650px) {
+  .detailgrid {
+  grid-template-columns:1fr}
+.scroll {
+  max-height:70vh}
+th,td {
+  font-size:9px;
+  padding:6px 3px}
+}
+
+
+.views {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:0 0 12px}
+.view {
+  font-weight:600}
+.view.active {
+  background:#dbeafe;
+  border-color:#2563eb}
+.tools {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center}
+.ofpanel {
+  display:none;
+  background:#fff;
+  border:1px solid #dce5f1;
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:12px}
+.ofpanel.on {
+  display:block}
+.ofgrid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin:12px 0}
+.stat {
+  background:#f3f7fc;
+  border-radius:9px;
+  padding:12px}
+.stat strong {
+  font-size:21px;
+  display:block}
+.saved {
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin:10px 0}
+.saved button {
+  font-size:12px}
+.copybtn {
+  border:0;
+  padding:3px 5px;
+  color:#2563eb;
+  background:transparent;
+  vertical-align:middle}
+.copybtn:hover {
+  background:#e8f0ff}
+.fieldline {
+  display:flex;
+  align-items:center;
+  gap:5px}
+.fieldline span {
+  min-width:0}
+.detailcell .copybtn {
+  float:right}
+.hint {
+  color:#64748b;
+  font-size:12px}
+.pill {
+  border-radius:12px;
+  background:#eef3fa;
+  padding:4px 9px;
+  font-size:11px}
+.ofpanel input {
+  padding:10px;
+  border:1px solid #ccd8e8;
+  border-radius:8px;
+  max-width:260px;
+  width:100%}
+.ofpanel .toolbar {
+  margin:0}
+.shortcut {
+  font-size:11px;
+  color:#64748b}
+@media(max-width:700px) {
+  .ofgrid {
+  grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+
+/* MODO TRABAJO RÁPIDO — estilos independientes */
+.fastpanel[hidden]{display:none!important}.fastpanel{background:#fff;border:1px solid #dbe4ef;border-radius:18px;padding:24px;margin:18px 0;box-shadow:0 6px 24px #1d355710}.fasttop,.fastcontrols,.fastactions,.fastfoot,.fastcardhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.fasttop h2{margin:0;color:#172b4d}.fasttop p,.fastmuted,.fastorigin,.fastfoot span{color:#64748b}.fastcontrols{justify-content:flex-start;margin:20px 0}.fastprogress{height:9px;background:#e9eef6;border-radius:20px;overflow:hidden}.fastprogress div{height:100%;background:#2475ed;width:0;transition:width .2s}.faststatus{margin:12px 0;color:#475569;font-size:13px}.fastcard{border:1px solid #e0e8f1;border-radius:16px;padding:22px;background:#fcfdff}.fastcardhead{align-items:flex-start;border-bottom:1px solid #e5edf6;padding-bottom:15px}.fastcardhead h2{font-size:27px;margin:5px 0}.fastcardhead p{margin:0}.fastflags{display:flex;gap:8px;flex-wrap:wrap}.fastchip{border:1px solid #d8e1ec;background:white;padding:7px 10px;border-radius:20px;font-size:12px}.fastchip i{display:inline-block;width:12px;height:12px;border:1px solid #cbd5e1;border-radius:3px;vertical-align:middle;margin-right:7px}.fastgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}.fastfield{background:#f4f7fb;padding:12px;border-radius:10px;min-width:0}.fastfield small{display:block;color:#64748b;margin-bottom:8px}.fastfield div{display:flex;align-items:flex-start;justify-content:space-between;gap:7px}.fastfield strong{overflow-wrap:anywhere;font-size:14px}.fastcopy{padding:3px 7px!important;flex-shrink:0}.fastorigin{font-size:12px;margin-top:18px}.fastactions{justify-content:flex-start;margin-top:18px}.fastfoot{justify-content:flex-start;margin-top:15px;font-size:12px}.pick{width:15px;height:15px;cursor:pointer}.fastlaunch{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0}@media(max-width:850px){.fastgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.fastgrid{grid-template-columns:1fr}.fastpanel{padding:12px}.fastcard{padding:13px}}
+
+/* Cantidades independientes: nunca se mezclan carga y devolución. */
+.qtyload{font-weight:700;color:#17603a}.qtyreturn{font-weight:700;color:#a44318}th{overflow-wrap:anywhere}
+
+/* V10: Filtros combinados y resumen de cantidades */
+.multi-panel{background:#fff;border:1px solid #dce5f1;border-radius:14px;padding:18px;margin:16px 0;box-shadow:0 2px 10px #163d7310;color:#213450}
+.multi-heading,.totals-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.multi-heading h2,.totals-head h3{margin:0 0 6px;font-size:18px}.multi-heading p{margin:0;color:#64748b;font-size:13px}
+.multi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0}
+.multi-grid label{display:flex;flex-direction:column;gap:6px;font-weight:650;font-size:12px;color:#334155;min-width:0}
+.multi-grid input{width:100%;min-width:0;box-sizing:border-box;padding:11px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#172b4d;font:inherit}
+.multi-grid input:focus{outline:2px solid #93c5fd;border-color:#2563eb}
+.totals-head{margin:16px 0 10px}.totals-head span,.group-note{font-size:12px;color:#64748b}
+.totals-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.total-card{padding:14px;background:#f7f9fc;border:1px solid #e3eaf3;border-radius:10px;display:flex;flex-direction:column;gap:7px;min-width:0}.total-card small{color:#64748b}.total-card strong{font-size:23px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.total-card.load strong{color:#16834a}.total-card.return strong{color:#c24135}
+.group-details{margin-top:17px}.group-details summary{cursor:pointer;font-weight:700;padding:9px 0}.group-scroll{overflow-x:auto}.group-table{width:100%;border-collapse:collapse;font-size:12px}.group-table th,.group-table td{text-align:left;border-bottom:1px solid #e7edf5;padding:10px 7px;overflow-wrap:anywhere}.group-table th{background:#f1f5f9}.group-table td:nth-child(n+4){font-variant-numeric:tabular-nums}.group-note{line-height:1.5}
+@media(max-width:1050px){.multi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:650px){.multi-grid,.totals-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.multi-panel{padding:12px}.total-card strong{font-size:18px}}
+
+/* v11: filtros y totales dentro de la misma tarjeta de búsqueda */
+.unified-filters{margin-top:18px;padding-top:16px;border-top:1px solid #e2e8f0}
+.unified-filters .multi-heading h3{font-size:15px;margin:0 0 5px}
+.unified-filters .multi-grid{margin:12px 0 18px}
+.unified-filters .totals-head{padding-top:14px;border-top:1px solid #edf2f7}
+.unified-filters .totals-head h3{font-size:15px}
+.unified-filters .group-details{margin-top:10px}
+
+/* Hoja de trabajo imprimible */
+.print-overlay[hidden]{display:none!important}.print-overlay{position:fixed;inset:0;z-index:5000;background:#0f172a80;display:flex;align-items:center;justify-content:center;padding:18px}
+.print-dialog{width:min(530px,100%);max-height:90vh;overflow:auto;background:white;border-radius:14px;padding:24px;box-shadow:0 20px 70px #0003;color:#172b4d}
+.print-title{display:flex;align-items:center;justify-content:space-between;gap:12px}.print-title h2{margin:0;font-size:20px}.print-dialog p{color:#64748b;font-size:13px;line-height:1.5}
+.print-dialog>label{display:flex;flex-direction:column;gap:6px;margin-top:13px;font-size:13px;font-weight:650}.print-dialog input:not([type=checkbox]),.print-dialog select{border:1px solid #cbd5e1;padding:10px;border-radius:8px;font:inherit;width:100%;box-sizing:border-box;background:white;color:#172b4d}
+.print-dialog .print-check{flex-direction:row;align-items:center;font-weight:500}.print-count{margin-top:14px;color:#475569;font-size:12px}.print-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+</style>
+ </head>
+ <body>
+  <header>
+   <div>
+    <h1>
+     ▦ Almacén General · Control de materiales
+    </h1>
+    <p>
+     Consulta de artículos, cargas, devoluciones y movimientos registrados
+    </p>
+   </div>
+   <div>
+    <button id="printSheet" type="button">🖨 Hoja de trabajo</button>
+    <button id="export">
+     Exportar listado
+    </button>
+    <button class="primary" id="upload">
+     Cargar Excel actualizado
+    </button>
+    <input accept=".xlsx,.xls" hidden="" id="file" type="file"/>
+   </div>
+  </header>
+  <main class="wrap">
+   <nav class="views">
+    <button class="view active" id="taball">
+     ☷ Registro de movimientos
+    </button>
+    <button class="view" id="tabof">
+     ▤ Cargas por OF
+    </button>
+   <button class="view" id="tabfast">⚡ Revisión de cargas</button></nav>
+   <section class="ofpanel" id="ofpanel">
+    <h2>
+     Consulta de movimientos por orden de fabricación
+    </h2>
+    <p>
+     Consulta los artículos y movimientos registrados para una orden de fabricación.
+    </p>
+    <div class="toolbar">
+     <input id="ofquery" placeholder="Introducir número de OF"/>
+     <button id="ofclear">
+      Quitar OF
+     </button>
+     <button class="primary" id="ofcopy">
+      Copiar listado de la OF
+     </button>
+    </div>
+    <div class="ofgrid" id="ofstats">
+    </div>
+    <div class="hint" id="ofnote">
+    </div>
+   </section>
+   <section id="fastpanel" class="fastpanel" hidden>
+ <div class="fasttop"><div><h2>⚡ Revisión de registros</h2><p>Consulta y revisa las líneas de carga y devolución antes de trabajar en BaaN.</p></div><button id="fastExit">Volver a movimientos</button></div>
+ <div class="fastcontrols"><button id="fastFromResults" class="primary">Revisar resultados de la búsqueda</button><button id="fastFromSelected">Revisar líneas seleccionadas</button><button id="fastClearSelection">Quitar selección</button><span id="fastSelectionCount"></span></div>
+ <div class="fastprogress"><div id="fastProgressBar"></div></div><div class="faststatus" id="fastStatus"></div>
+ <div id="fastCard" class="fastcard"></div>
+ <div class="fastactions"><button id="fastPrev">← Anterior</button><button id="fastCopyAll">Copiar datos del registro</button><button id="fastReviewed" class="primary">✓ Marcar revisado y continuar</button><button id="fastNext">Siguiente →</button></div>
+ <div class="fastfoot"><label>Ir al registro <input id="fastJump" type="number" min="1" style="width:85px"/></label><button id="fastGo">Ir</button><button id="fastResetProgress">Borrar marcas de revisión</button><span>Atajos: ← → navegar · Ctrl+Enter revisar · Ctrl+K buscar</span></div>
+ </section>
+ <section class="hero">
+    <h2>
+     Consulta de cargas y movimientos de artículos
+    </h2>
+    <input autofocus="" class="search" id="q" placeholder="Buscar artículo, descripción, OF, lote, ubicación o incidencia…"/>
+    <div class="toolbar">
+     <select id="field">
+      <option value="all">
+       Buscar en todas las columnas
+      </option>
+      <option value="5">
+       Código de artículo
+      </option>
+      <option value="6">
+       Descripción
+      </option>
+      <option value="7">
+       Lote
+      </option>
+      <option value="12">
+       Orden de fabricación
+      </option>
+      <option value="10">
+       Ubicación origen
+      </option>
+      <option value="11">
+       Ubicación destino
+      </option>
+     </select>
+     <select id="sheet">
+      <option value="all">
+       Todos los tipos de movimiento
+      </option>
+     </select>
+     <select id="color">
+      <option value="all">
+       Todos los estados (colores)
+      </option>
+     </select>
+     <select id="sort">
+      <option value="original">
+       Orden original del Excel
+      </option>
+      <option value="new">
+       Fecha más reciente
+      </option>
+      <option value="old">
+       Fecha más antigua
+      </option>
+     </select>
+     <button id="reset">
+      Borrar búsqueda y filtros
+     </button>
+     <button id="saveview">
+      ☆ Guardar consulta
+     </button>
+     <button id="deleteview">
+      Eliminar consulta guardada
+     </button>
+    </div>
+    <div class="saved" id="savedviews">
+    </div>
+    <p class="shortcut">
+     Ctrl + K para buscar · Puedes combinar artículo, OF y lote · Pulsa ⧉ para copiar un dato
+    </p>
+    <p class="notice" id="source">
+     Datos del Excel cargado. Utiliza «Cargar Excel actualizado» para consultar la última versión.
+    </p>
+      <div class="unified-filters" aria-label="Filtros combinados y totales">
+ <div class="multi-heading"><div><h3>Filtros de artículos y órdenes de fabricación</h3><p>Filtra por código, OF, descripción o lote. Puedes combinar varios campos para localizar las líneas registradas.</p></div><button id="clearMulti" type="button">Borrar búsqueda y filtros específicos</button></div>
+ <div class="multi-grid">
+  <label>Código de artículo<input id="filterArticle" type="search" placeholder="Código del artículo" autocomplete="off"></label>
+  <label>Orden de fabricación<input id="filterOF" type="search" placeholder="Número de OF" autocomplete="off"></label>
+  <label>Descripción<input id="filterDescription" type="search" placeholder="Descripción del material" autocomplete="off"></label>
+  <label>Lote<input id="filterLot" type="search" placeholder="Lote interno o proveedor" autocomplete="off"></label>
+ </div>
+ <div class="totals-head"><h3>Cantidades registradas en la búsqueda</h3><span id="totalsScope"></span></div>
+ <div class="totals-grid" id="multiTotals"></div>
+ <details class="group-details"><summary>Ver cargas y devoluciones agrupadas por artículo y OF</summary><div class="group-scroll"><table class="group-table"><thead><tr><th>Artículo</th><th>Descripción</th><th>OF</th><th>Líneas</th><th>Carga</th><th>Devolución</th><th>Neto</th></tr></thead><tbody id="groupTotals"></tbody></table></div></details>
+ <p class="group-note">Las cantidades corresponden a las líneas del Excel. No confirman que el movimiento esté contabilizado en BaaN.</p>
+</div>
+
+</section>
+<div class="fastlaunch"><button class="primary" id="fastLaunch">⚡ Iniciar trabajo rápido con los resultados</button><button id="fastSelectVisible">Seleccionar líneas visibles</button><span id="manualCount"></span></div><div class="meta">
+    <b id="counter">
+     Cargando…
+    </b>
+    <span>
+     Pulsa una línea para ver sus datos completos o copiar artículo, lote y OF
+    </span>
+   </div>
+   <section class="tablebox">
+    <div class="scroll" id="scroll">
+     <table>
+      <colgroup>
+       <col style="width:2%"/>
+       <col style="width:7%"/>
+       <col style="width:10%"/>
+       <col style="width:17%"/>
+       <col style="width:11%"/>
+       <col style="width:7%"/>
+       <col style="width:7%"/>
+       <col style="width:7%"/>
+       <col style="width:7%"/>
+       <col style="width:8%"/>
+       <col style="width:17%"/>
+      </colgroup>
+      <thead>
+       <tr>
+        <th>
+         ●
+        </th>
+        <th>
+         Fecha
+        </th>
+        <th>
+         Artículo
+        </th>
+        <th>
+         Descripción
+        </th>
+        <th>
+         Lote
+        </th>
+        <th>
+         Cant. carga
+        </th>
+        <th>
+         Cant. devolución
+        </th>
+        <th>
+         Origen
+        </th>
+        <th>
+         Destino
+        </th>
+        <th>
+         OF
+        </th>
+        <th>
+         Tipo / observaciones
+        </th>
+       </tr>
+      </thead>
+      <tbody id="tbody">
+      </tbody>
+     </table>
+     <div class="empty hide" id="empty">
+      No hay líneas registradas que coincidan con los filtros.
+     </div>
+     <div class="foot" id="sentinel">
+      Desplázate para ver más líneas
+     </div>
+    </div>
+   </section>
+  </main>
+  <div class="print-overlay" id="printOverlay" hidden>
+    <div class="print-dialog" role="dialog" aria-modal="true" aria-labelledby="printTitle">
+      <div class="print-title"><h2 id="printTitle">Hoja de trabajo imprimible</h2><button type="button" id="printClose">Cerrar ✕</button></div>
+      <p>Genera una hoja de comprobación con los movimientos del Excel. No modifica los registros originales.</p>
+      <label>Movimientos a incluir<select id="printScope"><option value="filtered">Todos los resultados filtrados</option><option value="selected">Solo las líneas seleccionadas</option></select></label>
+      <label>Formato<select id="printMode"><option value="detail">Detalle por movimiento (una línea por registro)</option><option value="group">Agrupado por OF, artículo y lote</option></select></label>
+      <label>OF concreta (opcional)<input id="printOF" type="search" placeholder="Vacío: todas las OF de la selección"/></label>
+      <div id="printCount" class="print-count"></div>
+      <div class="print-actions"><button type="button" id="printCancel">Cancelar</button><button type="button" id="printGenerate" class="primary">Abrir hoja para imprimir</button></div>
+    </div>
+  </div>
+  <div class="modalbg" id="modalbg">
+   <div class="modal">
+    <button id="close" style="float:right">
+     Cerrar ✕
+    </button>
+    <h2>
+     Detalle del movimiento registrado
+    </h2>
+    <div class="detailgrid" id="detail">
+    </div>
+   </div>
+  </div>
+  <script>
+window.DATOS_INICIALES = [];
+window.COLORES_INICIALES = [];
+</script>
+  <script>/**
+ * DASHBOARD DE ALMACÉN — LÓGICA PRINCIPAL
+ *
+ * Edita este archivo para modificar el buscador, filtros, tabla,
+ * agrupación por OF, vistas guardadas y copiado para BaaN.
+ * Los datos de ejemplo se encuentran en datos/registros.js.
+ * Los colores y apariencia se configuran en css/estilos.css.
+ */
+
+// Índices del registro: 0 hoja, 1 fila, 2 fecha, 3 NBI entrega, 4 NBI recepción,
+// 5 ARTÍCULO, 6 DEFINICIÓN, 7 LOTE, 8 devolución, 9 carga,
+// 10 origen, 11 destino, 12 OF, 13 HECHO, 14 comentario, 15 NBI.
+const names=['FECHA','NBI DE ENTREGA','NBI DE RECEPCIÓN','ARTÍCULO','DEFINICIÓN','LOTE','CANT. DEVOLUCIÓN','CANT. CARGA','UBICACIÓN ORIGEN','UBICACIÓN DESTINO','ORDEN FABRICACIÓN','HECHO','COMENTARIO','NBI'];
+let records=window.DATOS_INICIALES,colors=window.COLORES_INICIALES,filtered=[],shown=0,activeView='all',savedViews=[],selectedView='';const $=id=>document.getElementById(id);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const norm=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();const family=h=>{h=(h||'').replace('#','').toUpperCase();if(!h)return 'Sin color';let n=parseInt(h,16),r=n>>16,g=n>>8&255,b=n&255;if(r>175&&g<130&&b<130)return 'Rojo';if(r>170&&g>105&&g<215&&b<140)return 'Naranja';if(r>160&&g>150&&b<150)return 'Amarillo';if(g>r*1.13&&g>b*.85)return 'Verde';if(b>r*1.14&&b>g*1.14)return 'Azul';if(r>g*1.15&&b>g*1.1)return 'Morado';return 'Otros'};
+function setup(){let sheets=[...new Set(records.map(r=>r[0]))];$('sheet').innerHTML='<option value="all">Todas las hojas</option>'+sheets.map(s=>`<option value="${esc(s)}">${esc(s.trim())}</option>`).join('');$('color').innerHTML='<option value="all">Todos los colores</option>'+[...new Set(colors.map(family))].sort().map(c=>`<option>${c}</option>`).join('');apply()}
+function apply(){let q=norm($('q').value.trim()),terms=q.split(/\s+/).filter(Boolean),field=$('field').value,sheet=$('sheet').value,col=$('color').value,of=norm($('ofquery').value.trim());filtered=[];records.forEach((r,i)=>{if(sheet!=='all'&&r[0]!==sheet)return;if(col!=='all'&&family(colors[i])!==col)return;if(activeView==='of'&&of&&!norm(r[12]).includes(of))return;if(!passesMulti(r))return;if(terms.length){let cells=field==='all'?r:[r[+field]];let hay=norm(cells.join(' '));if(!terms.every(t=>hay.includes(t)))return}filtered.push(i)});if($('sort').value!=='original'){let sign=$('sort').value==='new'?-1:1;filtered.sort((a,b)=>sign*String(records[a][2]).localeCompare(String(records[b][2])))}shown=0;$('tbody').innerHTML='';$('scroll').scrollTop=0;more();$('empty').classList.toggle('hide',filtered.length>0);renderOfStats();renderMultiTotals()}
+function more(){if(shown>=filtered.length){$('sentinel').textContent='No hay más líneas';return}let ids=filtered.slice(shown,shown+65);shown+=ids.length;let frag=document.createDocumentFragment();ids.forEach(i=>{let r=records[i],tr=document.createElement('tr');let color=colors[i]||'',bg=color?'#'+color:'transparent';tr.innerHTML=`<td><span class="color" style="background:${bg}"></span><input type="checkbox" class="pick" title="Añadir a trabajo rápido" ${manualSelection.has(rowKey(i))?"checked":""}></td><td>${esc(r[2])}</td><td class="code">${esc(r[5])}<button class="copybtn" data-copy="5" title="Copiar código de artículo">⧉</button></td><td class="desc">${esc(r[6])}</td><td>${esc(r[7])}<button class="copybtn" data-copy="7" title="Copiar lote">⧉</button></td><td class="qtyload">${esc(r[9])||"—"}</td><td class="qtyreturn">${esc(r[8])||"—"}</td><td>${esc(r[10])}</td><td>${esc(r[11])}</td><td class="code">${esc(r[12])}<button class="copybtn" data-copy="12" title="Copiar orden de fabricación">⧉</button></td><td><b class="small">${esc(r[0].trim())}</b>${r[14]?`<div class="muted small">${esc(r[14])}</div>`:''}</td>`;tr.addEventListener('click',e=>{if(e.target.classList.contains('pick')){e.stopPropagation();let k=rowKey(i);if(e.target.checked)manualSelection.add(k);else manualSelection.delete(k);saveManual();updateSelection();return}let btn=e.target.closest('[data-copy]');if(btn){e.stopPropagation();copyText(r[Number(btn.dataset.copy)],btn);return}detail(i)});frag.appendChild(tr)});$('tbody').appendChild(frag);$('counter').textContent=`${shown.toLocaleString('es-ES')} de ${filtered.length.toLocaleString('es-ES')} registros`; $('sentinel').textContent=shown<filtered.length?'Desplázate para ver más líneas':'No hay más líneas'}
+$('scroll').addEventListener('scroll',()=>{let el=$('scroll');if(el.scrollTop+el.clientHeight>=el.scrollHeight-350)more()});function detail(i){let r=records[i];$('detail').innerHTML=`<div class="detailcell"><strong>COLOR ORIGINAL</strong><span class="color" style="background:${colors[i]?'#'+colors[i]:'transparent'}"></span> ${esc(family(colors[i]))}</div><div class="detailcell"><strong>HOJA / FILA</strong>${esc(r[0])} · ${esc(r[1])}</div>`+names.map((n,j)=>`<div class="detailcell"><strong>${esc(n)}</strong><button class="copybtn" data-val="${j+2}" title="Copiar">⧉</button>${esc(r[j+2])||'—'}</div>`).join('');$('modalbg').style.display='flex';$('detail').querySelectorAll('[data-val]').forEach(b=>b.onclick=()=>copyText(r[Number(b.dataset.val)],b))}$('close').onclick=()=>$('modalbg').style.display='none';$('modalbg').onclick=e=>{if(e.target===$('modalbg'))$('modalbg').style.display='none'};for(let id of ['q','field','sheet','color','sort','ofquery'])$(id).addEventListener(id==='q'?'input':'change',apply);$('reset').onclick=()=>{for(let id of ['filterArticle','filterOF','filterDescription','filterLot','ofquery'])$(id).value='';for(let id of ['q'])$(id).value='';for(let id of ['field','sheet','color','sort'])$(id).selectedIndex=0;apply()};$('upload').onclick=()=>$('file').click();
+// ExcelJS conserva los rellenos de las celdas; no depende de índices de columnas fijos.
+// Importación diaria: detecta encabezados reales y conserva colores de relleno.
+$('file').onchange=async e=>{
+ const f=e.target.files?.[0]; if(!f)return;
+ const source=$('source'); const button=$('upload');button.disabled=true;
+ source.textContent='Importando '+f.name+'…';
+ try{
+  if(!window.ExcelJS){
+   await new Promise((resolve,reject)=>{
+    const script=document.createElement('script');
+    script.src='https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';
+    script.onload=resolve;script.onerror=()=>reject(new Error('No se pudo descargar el lector ExcelJS. Comprueba la conexión a Internet.'));
+    document.head.appendChild(script);
+   });
+  }
+  const workbook=new ExcelJS.Workbook();await workbook.xlsx.load(await f.arrayBuffer());
+  const next=[],nextColors=[];
+  const key=s=>norm(s).replace(/[^a-z0-9]/g,'');
+  const val=c=>{
+   let v=c?.value;
+   if(v===null||v===undefined)return '';
+   if(v instanceof Date)return [v.getFullYear(),String(v.getMonth()+1).padStart(2,'0'),String(v.getDate()).padStart(2,'0')].join('-');
+   if(typeof v==='object')return String(v.text??v.result??v.richText?.map(t=>t.text).join('')??'').trim();
+   return String(v).trim();
+  };
+  workbook.eachSheet(ws=>{
+   let header=0,columns={};
+   ws.eachRow((row,n)=>{
+    if(header||n>35)return;
+    const labels=[];
+    row.eachCell({includeEmpty:true},(cell,col)=>{labels[col]=key(val(cell))});
+    if(labels.some(x=>x?.includes('articulo'))&&labels.some(x=>x?.includes('lote'))){
+     header=n;labels.forEach((label,col)=>{if(label)columns[label]=col});
+    }
+   });
+   if(!header)return;
+   const find=(...aliases)=>{
+    for(const a of aliases){const k=key(a);if(columns[k])return columns[k]}
+    for(const a of aliases){const k=key(a);if(k.length<5)continue;const found=Object.entries(columns).find(([h])=>h.startsWith(k));if(found)return found[1]}
+    return -1;
+   };
+   const ix=[
+    find('fecha'),find('nbi de entrega'),find('nbi de recepcion'),
+    find('articulo'),find('definicion','descripcion'),find('lote'),
+    find('cant devolucion','cantidad devolucion'),find('cant carga','cantidad carga'),
+    find('ubic origen','ubicacion origen','origen'),
+    find('ubic destino','ubicacion destino','destino'),
+    find('orden fabricac','orden de fabricacion','orden fabricacion','of'),
+    find('hecho'),find('comentario','observaciones'),find('nbi')
+   ];
+   if(ix[3]<1 || ix[4]<1) return;
+   ws.eachRow((row,n)=>{
+    if(n<=header)return;
+    const values=ix.map(j=>j<1?'':val(row.getCell(j)));
+    if(!values[3]&&!values[4])return;
+    next.push([ws.name,n,...values]);
+    let color='';
+    for(const j of [ix[3],ix[4],1,...ix]){
+     if(j<1)continue;
+     const fill=row.getCell(j).fill;
+     const argb=fill?.fgColor?.argb;
+     if(fill?.pattern==='solid'&&argb&&/^[0-9a-f]{8}$/i.test(argb)){
+      color=argb.slice(-6).toUpperCase();break;
+     }
+    }
+    nextColors.push(color);
+   });
+  });
+  if(!next.length)throw new Error('No se han encontrado líneas. Revisa los encabezados de las hojas.');
+  records=next;colors=nextColors;
+  $('q').value='';$('ofquery').value='';$('field').selectedIndex=0;
+  // Evitar que las selecciones de otro Excel se apliquen a registros nuevos.
+  if(typeof manualSelection!=='undefined')manualSelection.clear();
+  if(typeof fastQueue!=='undefined'){fastQueue=[];fastPosition=0;fastReviewed.clear()}
+  source.textContent='Excel actualizado: '+f.name+' · '+next.length.toLocaleString('es-ES')+' registros';
+  
+setup();renderSaved();
+  if(typeof renderFast==='function')renderFast();
+ }catch(err){
+  source.textContent='No se ha podido cargar '+f.name+': '+err.message;
+  alert('Error al cargar el Excel: '+err.message);
+ }finally{button.disabled=false;e.target.value=''}
+};
+let manualSelection=new Set(), fastQueue=[],fastPosition=0,fastReviewed=new Set();
+$('export').onclick=()=>{let head=['Hoja','Fila',...names,'Color'];let out=[head,...filtered.map(i=>[...records[i],colors[i]||''])];let csv='\ufeff'+out.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='materiales_filtrados.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+// FILTROS COMBINADOS Y SUMAS: los cuatro campos se combinan mediante AND.
+const MULTI_FIELDS={filterArticle:5,filterOF:12,filterDescription:6,filterLot:7};
+function passesMulti(row){return Object.entries(MULTI_FIELDS).every(([id,column])=>{const value=norm($(id).value.trim());return !value||norm(row[column]).includes(value)})}
+function quantityNumber(value){
+ if(value===null||value===undefined||String(value).trim()==='')return 0;
+ if(typeof value==='number')return Number.isFinite(value)?value:0;
+ let str=String(value).trim().replace(/\s/g,'');
+ // Interpretación española: 1.234,50 y 1234,50; también 1234.50.
+ if(str.includes(',')&&str.includes('.'))str=str.lastIndexOf(',')>str.lastIndexOf('.')?str.replace(/\./g,'').replace(',','.'):str.replace(/,/g,'');
+ else if(str.includes(','))str=str.replace(',','.');
+ else if(/^[-+]?\d{1,3}(\.\d{3})+$/.test(str))str=str.replace(/\./g,'');
+ const num=Number(str);return Number.isFinite(num)?num:0;
+}
+const formatQuantity=value=>new Intl.NumberFormat('es-ES',{maximumFractionDigits:4}).format(value);
+function renderMultiTotals(){
+ const rows=filtered.map(i=>records[i]);let charge=0,returned=0;const groups=new Map();
+ for(const r of rows){const c=quantityNumber(r[9]),d=quantityNumber(r[8]);charge+=c;returned+=d;
+ const code=String(r[5]??'').trim(),of=String(r[12]??'').trim(),key=JSON.stringify([code,of]);
+ if(!groups.has(key))groups.set(key,{code,of,description:String(r[6]??''),lines:0,charge:0,returned:0});
+ const g=groups.get(key);g.lines++;g.charge+=c;g.returned+=d;
+ }
+ const cards=[['Líneas registradas',rows.length,''],['Cantidad total de carga',charge,'load'],['Cantidad total de devolución',returned,'return'],['Diferencia carga - devolución',charge-returned,'net']];
+ $('multiTotals').innerHTML=cards.map(([name,value,cls],i)=>`<div class="total-card ${cls}"><small>${esc(name)}</small><strong>${i===0?value.toLocaleString('es-ES'):formatQuantity(value)}</strong></div>`).join('');
+ $('totalsScope').textContent=rows.length+' líneas · '+groups.size+' artículos/OF diferentes';
+ const sorted=[...groups.values()].sort((a,b)=>a.code.localeCompare(b.code,'es',{numeric:true})||a.of.localeCompare(b.of,'es',{numeric:true}));
+ $('groupTotals').innerHTML=sorted.length?sorted.map(g=>`<tr><td class="code">${esc(g.code)||'—'}</td><td>${esc(g.description)||'—'}</td><td class="code">${esc(g.of)||'—'}</td><td>${g.lines}</td><td class="qtyload">${formatQuantity(g.charge)}</td><td class="qtyreturn">${formatQuantity(g.returned)}</td><td>${formatQuantity(g.charge-g.returned)}</td></tr>`).join(''):'<tr><td colspan="7">No hay movimientos para los filtros seleccionados.</td></tr>';
+}
+for(const id of Object.keys(MULTI_FIELDS))$(id).addEventListener('input',apply);
+$('clearMulti').onclick=()=>{for(const id of Object.keys(MULTI_FIELDS))$(id).value='';apply()};
+
+setup();
+
+function copyText(value,button){let str=String(value??'');if(!str)return;const fallback=()=>{let ta=document.createElement('textarea');ta.value=str;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()};if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(str).catch(fallback);else fallback();let old=button.textContent;button.textContent='✓';setTimeout(()=>button.textContent=old,950)}
+function renderOfStats(){let el=$('ofstats'),note=$('ofnote');if(activeView!=='of')return;let of=$('ofquery').value.trim();if(!of){el.innerHTML='';note.textContent='Introduce una OF para consultar los movimientos asociados.';return}let matches=filtered.map(i=>records[i]),items=new Set(matches.map(r=>String(r[5]).trim()).filter(Boolean)),lots=new Set(matches.map(r=>String(r[7]).trim()).filter(Boolean)),colCounts={};filtered.forEach(i=>{let k=family(colors[i]);colCounts[k]=(colCounts[k]||0)+1});let stats=[['Líneas registradas',matches.length],['Artículos diferentes',items.size],['Lotes distintos',lots.size],['Estados (colores)',Object.keys(colCounts).length]];el.innerHTML=stats.map(([n,v])=>`<div class="stat"><strong>${v.toLocaleString('es-ES')}</strong>${esc(n)}</div>`).join('');note.textContent=Object.entries(colCounts).map(([k,v])=>`${k}: ${v}`).join(' · ')||'No hay movimientos para esa OF';}
+function setTab(tab){activeView=tab;$('taball').classList.toggle('active',tab==='all');$('tabof').classList.toggle('active',tab==='of');$('ofpanel').classList.toggle('on',tab==='of');apply();}
+$('taball').onclick=()=>setTab('all');$('tabof').onclick=()=>setTab('of');$('ofclear').onclick=()=>{$('ofquery').value='';apply()};
+$('ofcopy').onclick=e=>{let lines=filtered.map(i=>records[i]);let summary='OF: '+$('ofquery').value+'\nLíneas: '+lines.length+'\n'+lines.map(r=>`Artículo ${r[5]} | ${r[6]} | Lote ${r[7]} | Carga ${r[9]||"—"} | Devolución ${r[8]||"—"} | Origen ${r[10]} | Destino ${r[11]}`).join('\n');copyText(summary,e.currentTarget)};
+const STORE='almacen_vistas_v5';try{savedViews=JSON.parse(localStorage.getItem(STORE)||'[]');if(!Array.isArray(savedViews))savedViews=[]}catch(e){savedViews=[]}
+function snapshot(){return {multi:Object.fromEntries(['filterArticle','filterOF','filterDescription','filterLot'].map(id=>[id,$(id).value])),q:$('q').value,field:$('field').value,sheet:$('sheet').value,color:$('color').value,sort:$('sort').value,of:$('ofquery').value,tab:activeView}}
+function renderSaved(){$('savedviews').innerHTML=savedViews.map((v,i)=>`<button data-view="${i}" class="${selectedView===v.name?'active':''}">★ ${esc(v.name)}</button>`).join('');$('savedviews').querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{let v=savedViews[+b.dataset.view];selectedView=v.name;for(let id of ['q','field','sheet','color','sort'])$(id).value=v.settings[id]??(id==='q'?'':'all');$('ofquery').value=v.settings.of||'';for(let id of ['filterArticle','filterOF','filterDescription','filterLot'])$(id).value=v.settings.multi?.[id]||'';setTab(v.settings.tab||'all');renderSaved()})}
+$('saveview').onclick=()=>{let name=prompt('Nombre para guardar esta consulta:');if(!name||!name.trim())return;name=name.trim().slice(0,55);let obj={name,settings:snapshot()};savedViews=savedViews.filter(v=>v.name!==name);savedViews.push(obj);selectedView=name;try{localStorage.setItem(STORE,JSON.stringify(savedViews))}catch(e){alert('No se ha podido guardar la consulta en este navegador.')}renderSaved()};
+$('deleteview').onclick=()=>{if(!selectedView){alert('Selecciona una consulta guardada.');return}savedViews=savedViews.filter(v=>v.name!==selectedView);selectedView='';try{localStorage.setItem(STORE,JSON.stringify(savedViews))}catch(e){}renderSaved()};
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('q').focus();$('q').select()}if(e.key==='Escape'){$('modalbg').style.display='none'}});renderSaved();
+
+
+/* ===============================================================
+   MODO TRABAJO RÁPIDO — editable de forma independiente
+   Las revisiones son locales y NO significan cargas en BaaN IV.
+   =============================================================== */
+const FAST_STORAGE='almacen_rapido_v7';
+const FAST_SELECTED='almacen_seleccion_v7';
+// El estado del modo rápido se declara antes de la primera llamada a setup().
+function rowKey(i){let r=records[i];return [r[0],r[1],r[5],r[7],r[12]].map(x=>String(x??'')).join('|')}
+function readFast(){try{let s=JSON.parse(localStorage.getItem(FAST_STORAGE)||'{}');fastReviewed=new Set(s.reviewed||[]);return s}catch{return {}}}
+function saveFast(){try{localStorage.setItem(FAST_STORAGE,JSON.stringify({keys:fastQueue.map(rowKey),position:fastPosition,reviewed:[...fastReviewed]}))}catch{}}
+function saveManual(){try{localStorage.setItem(FAST_SELECTED,JSON.stringify([...manualSelection]))}catch{}}
+function updateSelection(){$('manualCount').textContent=`${manualSelection.size} seleccionadas`;$('fastSelectionCount').textContent=`${manualSelection.size} líneas seleccionadas`}
+try{manualSelection=new Set(JSON.parse(localStorage.getItem(FAST_SELECTED)||'[]'))}catch{}
+readFast();updateSelection();
+function openFast(){activeFast=true;$('fastpanel').hidden=false;$('fastpanel').scrollIntoView({behavior:'smooth',block:'start'});$('tabfast').classList.add('active');$('taball').classList.remove('active');$('tabof').classList.remove('active');renderFast()}
+let activeFast=false;
+function closeFast(){activeFast=false;$('fastpanel').hidden=true;$('tabfast').classList.remove('active');$('taball').classList.toggle('active',activeView==='all');$('tabof').classList.toggle('active',activeView==='of')}
+function setQueue(indices){fastQueue=[...indices];fastPosition=0;fastReviewed=new Set();saveFast();openFast()}
+function renderFast(){updateSelection();let total=fastQueue.length,completed=fastQueue.filter(i=>fastReviewed.has(rowKey(i))).length;$('fastStatus').textContent=total?`Registro ${fastPosition+1} de ${total} · ${completed} revisados · ${total-completed} pendientes de revisión`:'No hay líneas seleccionadas para revisar.';$('fastProgressBar').style.width=(total?100*completed/total:0)+'%';$('fastPrev').disabled=!total||fastPosition===0;$('fastNext').disabled=!total||fastPosition>=total-1;$('fastReviewed').disabled=!total;$('fastCopyAll').disabled=!total;$('fastJump').max=Math.max(1,total);$('fastJump').value=total?fastPosition+1:'';
+if(!total){$('fastCard').innerHTML='<p>Pulsa «Revisar resultados de la búsqueda» o selecciona líneas en la tabla.</p>';return}
+let i=fastQueue[fastPosition],r=records[i],color=colors[i],done=fastReviewed.has(rowKey(i));let fields=[['Artículo',r[5]],['Descripción',r[6]],['OF',r[12]],['Lote',r[7]],['Cantidad de carga',r[9]],['Cantidad de devolución',r[8]],['Ubicación origen',r[10]],['Ubicación destino',r[11]],['Fecha',r[2]],['Comentario',r[14]],['Campo HECHO (Excel)',r[13]]];
+$('fastCard').innerHTML=`<div class="fastcardhead"><div><span class="fastmuted">ARTÍCULO</span><h2>${esc(r[5]||'Sin código')}</h2><p>${esc(r[6])}</p></div><div class="fastflags"><span class="fastchip"><i style="background:${color?'#'+color:'#fff'}"></i>${esc(family(color))}</span><span class="fastchip">${done?'✓ Revisado en esta sesión':'Sin revisar en esta sesión'}</span></div></div><div class="fastgrid">${fields.map(([label,value])=>`<div class="fastfield"><small>${esc(label)}</small><div><strong>${esc(value)||'—'}</strong><button class="fastcopy" data-field="${esc(label)}" title="Copiar ${esc(label)}">⧉</button></div></div>`).join('')}</div><div class="fastorigin">Hoja: ${esc(r[0])} · Fila original: ${esc(r[1])} · La marca de revisión solo se guarda en este navegador.</div>`;
+$('fastCard').querySelectorAll('.fastcopy').forEach(b=>b.onclick=()=>{let entry=fields.find(([label])=>label===b.dataset.field);if(entry)copyText(entry[1],b)});
+}
+function moveFast(step){if(!fastQueue.length)return;fastPosition=Math.min(fastQueue.length-1,Math.max(0,fastPosition+step));saveFast();renderFast()}
+function fastSummary(){if(!fastQueue.length)return '';let r=records[fastQueue[fastPosition]];return ['Artículo: '+r[5],'Descripción: '+r[6],'OF: '+r[12],'Lote: '+r[7],'Cantidad de carga: '+r[9],'Cantidad de devolución: '+r[8],'Origen: '+r[10],'Destino: '+r[11]].join('\n')}
+$('tabfast').onclick=()=>{let saved=readFast(),lookup=new Map(records.map((r,i)=>[rowKey(i),i]));if(!fastQueue.length&&saved.keys?.length){fastQueue=saved.keys.map(k=>lookup.get(k)).filter(i=>i!==undefined);fastPosition=Math.min(saved.position||0,Math.max(0,fastQueue.length-1))}openFast()};
+$('fastLaunch').onclick=()=>setQueue(filtered);
+$('fastFromResults').onclick=()=>setQueue(filtered);
+$('fastFromSelected').onclick=()=>{let chosen=records.map((r,i)=>i).filter(i=>manualSelection.has(rowKey(i)));if(!chosen.length){alert('Selecciona primero las líneas que quieres revisar.');return}setQueue(chosen)};
+$('fastSelectVisible').onclick=()=>{filtered.slice(0,shown).forEach(i=>manualSelection.add(rowKey(i)));saveManual();updateSelection();document.querySelectorAll('#tbody tr').forEach(tr=>{let cb=tr.querySelector('.pick');if(cb)cb.checked=true})};
+$('fastClearSelection').onclick=()=>{manualSelection.clear();saveManual();updateSelection();document.querySelectorAll('.pick').forEach(x=>x.checked=false)};
+$('fastExit').onclick=closeFast;
+$('fastPrev').onclick=()=>moveFast(-1);$('fastNext').onclick=()=>moveFast(1);
+$('fastReviewed').onclick=()=>{if(!fastQueue.length)return;fastReviewed.add(rowKey(fastQueue[fastPosition]));if(fastPosition<fastQueue.length-1)fastPosition++;saveFast();renderFast()};
+$('fastCopyAll').onclick=e=>copyText(fastSummary(),e.currentTarget);
+$('fastGo').onclick=()=>{let n=Number($('fastJump').value);if(Number.isInteger(n)&&n>=1&&n<=fastQueue.length){fastPosition=n-1;saveFast();renderFast()}};
+$('fastResetProgress').onclick=()=>{if(confirm('¿Reiniciar las marcas de revisión de esta lista?')){fastReviewed.clear();fastPosition=0;saveFast();renderFast()}};
+document.addEventListener('keydown',e=>{if(!activeFast||!fastQueue.length)return;let typing=['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName);if(typing)return;if(e.key==='ArrowRight'){e.preventDefault();moveFast(1)}else if(e.key==='ArrowLeft'){e.preventDefault();moveFast(-1)}else if(e.key==='Enter'&&e.ctrlKey){e.preventDefault();$('fastReviewed').click()}});
+// Al cambiar de Excel, las referencias anteriores pueden no coincidir.
+$('file').addEventListener('change',()=>{closeFast();fastQueue=[];fastPosition=0;fastReviewed.clear();manualSelection.clear();saveFast();saveManual();updateSelection()});
+
+
+// Hoja de trabajo: usa exactamente los resultados filtrados o las líneas marcadas.
+(function setupPrintableSheet(){
+ const overlay=$('printOverlay');
+ const matching=()=>{
+   const scope=$('printScope').value;
+   const ids=scope==='selected'?records.map((_,i)=>i).filter(i=>manualSelection.has(rowKey(i))):[...filtered];
+   const of=norm($('printOF').value.trim());
+   return ids.filter(i=>!of||norm(records[i][12]).includes(of));
+ };
+ function count(){const ids=matching();$('printCount').textContent=`${ids.length.toLocaleString('es-ES')} movimientos incluidos · ${new Set(ids.map(i=>String(records[i][12]??''))).size} OF diferentes`;}
+ function open(){overlay.hidden=false;count();}
+ function close(){overlay.hidden=true;}
+ $('printSheet').addEventListener('click',open);
+ $('printClose').addEventListener('click',close);
+ $('printCancel').addEventListener('click',close);
+ overlay.addEventListener('click',e=>{if(e.target===overlay)close()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden)close()});
+ ['printScope','printOF','printMode'].forEach(id=>$(id).addEventListener(id==='printOF'?'input':'change',count));
+ const display=v=>esc(String(v??'').trim()||'—');
+ const num=v=>quantityNumber(v);
+ const fmt=v=>Number(v).toLocaleString('es-ES',{maximumFractionDigits:4});
+ $('printGenerate').addEventListener('click',()=>{
+   const ids=matching();if(!ids.length){alert('No hay movimientos para imprimir. Revisa los filtros o la selección.');return;}
+   const mode=$('printMode').value;
+   
+   const rows=ids.map(i=>records[i]);
+   let body='',head='';
+   if(mode==='detail'){
+     head='<tr><th>✓</th><th>Fecha</th><th>OF</th><th>Artículo</th><th>Descripción</th><th>Lote</th><th>Carga</th><th>Devol.</th><th>Origen</th><th>Destino</th><th>Hoja / fila</th></tr>';
+     body=rows.map(r=>`<tr><td class="tick">□</td><td>${display(r[2])}</td><td>${display(r[12])}</td><td>${display(r[5])}</td><td>${display(r[6])}</td><td>${display(r[7])}</td><td class="n">${display(r[9])}</td><td class="n">${display(r[8])}</td><td>${display(r[10])}</td><td>${display(r[11])}</td><td>${display(r[0])} / ${display(r[1])}</td></tr>`).join('');
+   }else{
+     const groups=new Map();
+     for(const r of rows){const key=JSON.stringify([r[12],r[5],r[7]]);let g=groups.get(key);if(!g){g={of:r[12],article:r[5],desc:r[6],lot:r[7],load:0,returned:0,count:0,origins:new Set(),destinations:new Set()};groups.set(key,g)}g.count++;g.load+=num(r[9]);g.returned+=num(r[8]);if(r[10])g.origins.add(String(r[10]));if(r[11])g.destinations.add(String(r[11]));}
+     head='<tr><th>✓</th><th>OF</th><th>Artículo</th><th>Descripción</th><th>Lote</th><th>Líneas</th><th>Carga</th><th>Devol.</th><th>Origen(es)</th><th>Destino(s)</th></tr>';
+     body=[...groups.values()].map(g=>`<tr><td class="tick">□</td><td>${display(g.of)}</td><td>${display(g.article)}</td><td>${display(g.desc)}</td><td>${display(g.lot)}</td><td class="n">${g.count}</td><td class="n">${fmt(g.load)}</td><td class="n">${fmt(g.returned)}</td><td>${display([...g.origins].join(', '))}</td><td>${display([...g.destinations].join(', '))}</td></tr>`).join('');
+   }
+   const totalLoad=rows.reduce((s,r)=>s+num(r[9]),0),totalReturn=rows.reduce((s,r)=>s+num(r[8]),0);
+   const page=`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Hoja de trabajo · Almacén General</title><style>
+   @page{size:A4 landscape;margin:10mm}*{box-sizing:border-box}body{font:10px Arial,sans-serif;color:#1e293b;margin:0}p{margin:4px 0}.muted{color:#64748b}.summary{display:flex;gap:18px;flex-wrap:wrap;margin:9px 0 12px;font-size:11px}.summary b{font-size:13px}table{border-collapse:collapse;width:100%;table-layout:fixed}th,td{border:1px solid #cbd5e1;padding:5px 4px;vertical-align:top;overflow-wrap:anywhere}th{background:#e9eef5;text-align:left}tr{break-inside:avoid}.tick{font-size:17px;text-align:center;width:22px}.n{text-align:right;font-variant-numeric:tabular-nums}.note{font-size:9px;color:#475569;margin:12px 0}.notes{border:1px solid #94a3b8;min-height:65px;padding:7px;margin-top:13px}.sign{display:flex;justify-content:space-between;gap:30px;margin-top:15px}.sign span{border-top:1px solid #64748b;padding-top:5px;min-width:180px}.actions{margin-bottom:12px;display:flex;gap:10px}.actions button{padding:8px 14px;cursor:pointer} @media print{.actions{display:none}thead{display:table-header-group}} </style></head><body>
+   <div class="actions"><button onclick="window.print()">Imprimir / Guardar como PDF</button><button onclick="window.close()">Cerrar</button></div>
+      <div class="summary"><span>Movimientos: <b>${rows.length}</b></span><span>OF: <b>${new Set(rows.map(r=>String(r[12]??''))).size}</b></span><span>Carga total: <b>${fmt(totalLoad)}</b></span><span>Devolución total: <b>${fmt(totalReturn)}</b></span></div>
+   <table><thead>${head}</thead><tbody>${body}</tbody></table>
+   </body></html>`;
+   const win=window.open('','_blank');if(!win){alert('El navegador ha bloqueado la ventana de impresión. Permite ventanas emergentes para esta página.');return;}
+   win.document.open();win.document.write(page);win.document.close();win.focus();close();
+ });
+})();
+</script>
+ </body>
+</html>
