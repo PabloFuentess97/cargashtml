@@ -6,7 +6,8 @@
   <title>
    Almacén General | Control de cargas
   </title>
-  <style>/* PERSONALIZACIÓN: modifica aquí colores, tipografía, tamaños y diseño. */
+  <style>
+/* PERSONALIZACIÓN: modifica aquí colores, tipografía, tamaños y diseño. */
 
 :root {
   font-family:Inter,Segoe UI,Arial,sans-serif;
@@ -327,6 +328,15 @@ th,td {
 .print-title{display:flex;align-items:center;justify-content:space-between;gap:12px}.print-title h2{margin:0;font-size:20px}.print-dialog p{color:#64748b;font-size:13px;line-height:1.5}
 .print-dialog>label{display:flex;flex-direction:column;gap:6px;margin-top:13px;font-size:13px;font-weight:650}.print-dialog input:not([type=checkbox]),.print-dialog select{border:1px solid #cbd5e1;padding:10px;border-radius:8px;font:inherit;width:100%;box-sizing:border-box;background:white;color:#172b4d}
 .print-dialog .print-check{flex-direction:row;align-items:center;font-weight:500}.print-count{margin-top:14px;color:#475569;font-size:12px}.print-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+
+/* Disponibilidad de cargas — módulo de comprobación en lectura */
+.stockpanel[hidden]{display:none!important}.stockpanel{background:#fff;border:1px solid #dbe4ef;border-radius:15px;padding:19px;margin-bottom:16px}
+.stockhead{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}.stockhead h2{margin:0 0 6px;font-size:18px}
+.stockupload{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:15px 0}.stockupload>div{padding:15px;border:1px solid #dde6f0;border-radius:11px}.stockupload p{margin:8px 0;color:#66758b}.stockwarning{background:#fff9e9;border:1px solid #f1db9b;padding:11px;border-radius:8px;line-height:1.5}
+.stocktools{display:flex;gap:9px;margin:15px 0;flex-wrap:wrap}.stocktools input{min-width:230px;flex:1;border:1px solid #d1dbe7;border-radius:8px;padding:10px}.stocksummaries{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-bottom:14px}.stocksummaries>div{border:1px solid #e0e7f0;background:#f8faff;padding:11px;border-radius:9px}.stocksummaries strong{display:block;font-size:19px}.stocksummaries small{display:block;color:#5f7189;margin-bottom:6px}
+.stocktablewrap{overflow:auto;max-height:65vh;border:1px solid #e1e7ee;border-radius:10px}.stocktable{width:100%;border-collapse:collapse;font-size:12px}.stocktable th{position:sticky;top:0;background:#f0f4f9;text-align:left;padding:10px;white-space:nowrap;z-index:1}.stocktable td{border-top:1px solid #e6ebf2;padding:9px;vertical-align:top;min-width:66px}.stocktable td:nth-child(3){min-width:195px}.stocktable td:last-child{min-width:220px}.stocktable .sbadge{display:inline-block;border-radius:7px;background:#eff3f8;padding:5px 7px;white-space:nowrap}.stocktable .sbadge.coverage{background:#dff3e5;color:#126b38}.stocktable .sbadge.partial{background:#fff0d5;color:#955a00}.stocktable .sbadge.nostock{background:#fce5e5;color:#9d2929}.stocktable .sbadge.review,.stocktable .sbadge.location,.stocktable .sbadge.done{background:#edf0f7;color:#42536b}.stockfoot{font-size:12px;padding-top:7px}
+@media(max-width:800px){.stockupload{grid-template-columns:1fr}.stocksummaries{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 </style>
  </head>
  <body>
@@ -358,7 +368,17 @@ th,td {
     <button class="view" id="tabof">
      ▤ Cargas por OF
     </button>
-   <button class="view" id="tabfast">⚡ Revisión de cargas</button></nav>
+   <button class="view" id="tabfast">⚡ Revisión de cargas</button><button class="view" id="tabstock">▤ Disponibilidad de cargas</button></nav>
+
+<section id="stockpanel" class="stockpanel" hidden>
+ <div class="stockhead"><div><h2>Disponibilidad de cargas · Maestro BaaN</h2><p>Comparación orientativa de líneas de carga con el stock de la exportación. No confirma que BaaN autorice el movimiento.</p></div><button id="stockExit">Volver a movimientos</button></div>
+ <div class="stockupload"><div><b>1 · Excel de cargas</b><p id="stockLoadInfo">Utiliza «Cargar Excel actualizado» en la cabecera.</p><button id="stockLoadBtn">Cargar Excel de cargas</button></div><div><b>2 · Maestro de stock</b><p id="stockMasterInfo">No se ha importado un maestro.</p><button id="stockMasterBtn" class="primary">Importar maestro BaaN</button><input type="file" id="stockMasterFile" accept=".xlsx" hidden/></div></div>
+ <div class="stockwarning">El maestro incluye códigos de estado y ubicaciones cuyo significado operativo debe confirmar el responsable de almacén. «Cobertura suficiente» solo compara cantidades en el fichero: no supone autorización para cargar. El cruce requiere coincidencia de artículo y lote; las ubicaciones se comprueban por separado. Los datos se procesan en este navegador.</div>
+ <div class="stocktools"><input id="stockSearch" placeholder="Filtrar por artículo, descripción, lote u OF"/><select id="stockFilter"><option value="all">Todos los resultados</option><option value="coverage">Cobertura suficiente · verificar</option><option value="partial">Cobertura parcial</option><option value="nostock">Sin stock coincidente</option><option value="location">Otra ubicación</option><option value="review">Revisión necesaria</option><option value="done">Marcado HECHO</option></select><button id="stockExport">Exportar comprobación CSV</button></div>
+ <div id="stockSummary" class="stocksummaries"></div>
+ <div class="stocktablewrap"><table class="stocktable"><thead><tr><th>Estado de comprobación</th><th>Artículo</th><th>Descripción</th><th>Lote cargas</th><th>OF</th><th>Origen</th><th>Cant. carga</th><th>Cobertura asignada</th><th>Faltante</th><th>Stock coincidente</th><th>Cód. estado BaaN</th><th>Detalle</th></tr></thead><tbody id="stockRows"><tr><td colspan="12">Importa el Excel de cargas y el maestro para realizar la comprobación.</td></tr></tbody></table></div>
+ <p class="stockfoot" id="stockFoot"></p>
+</section>
    <section class="ofpanel" id="ofpanel">
     <h2>
      Consulta de movimientos por orden de fabricación
@@ -568,10 +588,12 @@ th,td {
    </div>
   </div>
   <script>
-window.DATOS_INICIALES = [];
-window.COLORES_INICIALES = [];
+window.DATOS_INICIALES=[];
+window.COLORES_INICIALES=[];
+
 </script>
-  <script>/**
+  <script>
+/**
  * DASHBOARD DE ALMACÉN — LÓGICA PRINCIPAL
  *
  * Edita este archivo para modificar el buscador, filtros, tabla,
@@ -667,6 +689,7 @@ $('file').onchange=async e=>{
   
 setup();renderSaved();
   if(typeof renderFast==='function')renderFast();
+  document.dispatchEvent(new Event('almacen:cargas-actualizadas'));
  }catch(err){
   source.textContent='No se ha podido cargar '+f.name+': '+err.message;
   alert('Error al cargar el Excel: '+err.message);
@@ -809,6 +832,93 @@ $('file').addEventListener('change',()=>{closeFast();fastQueue=[];fastPosition=0
    win.document.open();win.document.write(page);win.document.close();win.focus();close();
  });
 })();
+
+</script>
+  <script>
+/* Comprobación local del maestro BaaN frente al Excel de cargas.
+ * No es una confirmación de material cargable en el ERP.
+ * No se guarda ni transmite ningún registro importado.
+ */
+(()=>{
+ 'use strict';
+ const el=id=>document.getElementById(id);
+ const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const canonical=v=>String(v??'').trim().toUpperCase().replace(/\s+/g,' ');
+ const qty=v=>{
+   if(typeof v==='number')return Number.isFinite(v)?v:0;
+   let s=String(v??'').trim().replace(/\s/g,'');if(!s)return 0;
+   if(s.includes(',')&&s.includes('.'))s=s.lastIndexOf(',')>s.lastIndexOf('.')?s.replace(/\./g,'').replace(',','.'):s.replace(/,/g,'');
+   else if(s.includes(','))s=s.replace(',','.');
+   else if(/^[-+]?\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,'');
+   const n=Number(s);return Number.isFinite(n)?n:NaN;
+ };
+ const fmt=v=>Number.isFinite(v)?v.toLocaleString('es-ES',{maximumFractionDigits:4}):'—';
+ const txt=cell=>{let v=cell?.value;if(v==null)return '';if(v instanceof Date)return v.toISOString().slice(0,10);if(typeof v==='object')return String(v.text??v.result??v.richText?.map(t=>t.text).join('')??'').trim();return String(v).trim()};
+ let master=[], results=[], display=[],sourceFile='';
+ async function excel(){if(window.ExcelJS)return;await new Promise((ok,bad)=>{let s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';s.onload=ok;s.onerror=()=>bad(Error('No se pudo cargar ExcelJS. Comprueba la conexión.'));document.head.append(s)})}
+ function parseStockLine(line,n){
+   const parts=String(line??'').split('|').map(s=>s.trim());
+   // Ejemplo: |CODIGO|DESCRIPCION|ESTADO|UBICACION|LOTE INTERNO|LOTE PROVEEDOR|...|UNIDAD|CANTIDAD|FECHA|
+   if(parts.length<13)return null;
+   const code=canonical(parts[1]),description=parts[2],status=canonical(parts[3]),location=canonical(parts[4]),lotInternal=canonical(parts[5]),lotSupplier=canonical(parts[6]),unit=canonical(parts[10]),amount=qty(parts[11]);
+   if(!code||!Number.isFinite(amount)||!unit)return null;
+   return {id:n,code,description,status,location,lotInternal,lotSupplier,unit,amount:Math.max(0,amount),date:parts[12]};
+ }
+ async function importMaster(file){
+   el('stockMasterBtn').disabled=true;el('stockMasterInfo').textContent='Leyendo '+file.name+'…';
+   try{
+     await excel();let wb=new ExcelJS.Workbook();await wb.xlsx.load(await file.arrayBuffer());let parsed=[];let total=0,invalid=0;
+     wb.eachSheet(ws=>ws.eachRow((row,n)=>{total++;let v=txt(row.getCell(1));let record=parseStockLine(v,total);if(record)parsed.push(record);else if(v.trim())invalid++}));
+     if(!parsed.length)throw Error('No se han reconocido registros del maestro separados por |.');
+     master=parsed;sourceFile=file.name;el('stockMasterInfo').textContent=`${file.name} · ${parsed.length.toLocaleString('es-ES')} registros válidos`+(invalid?` · ${invalid} líneas no reconocidas`: '');
+     recalc();
+   }catch(e){el('stockMasterInfo').textContent='Error: '+e.message;alert('Error al leer el maestro: '+e.message)}finally{el('stockMasterBtn').disabled=false;el('stockMasterFile').value=''}
+ }
+ function recalc(){
+   el('stockLoadInfo').textContent=records.length?`${records.length.toLocaleString('es-ES')} movimientos importados`:'Sin Excel de cargas: utiliza el botón de la cabecera.';
+   if(!master.length||!records.length){results=[];paint();return}
+   // Pool único por fila de stock. Cantidades disponibles nunca se asignan a más de una carga.
+   const pool=master.map(m=>({...m,remaining:m.amount}));
+   const byCode=new Map();pool.forEach(m=>{if(!byCode.has(m.code))byCode.set(m.code,[]);byCode.get(m.code).push(m)});
+   results=records.map((r,i)=>{
+     const code=canonical(r[5]),lot=canonical(r[7]),origin=canonical(r[10]),of=canonical(r[12]),charge=qty(r[9]),done=canonical(r[13]);
+     const base={i,r,code,lot,origin,of,requested:Number.isFinite(charge)?charge:0,assigned:0,shortfall:0,stocks:[],statuses:[],kind:'review',label:'Revisión necesaria',reason:''};
+     if(done){base.kind='done';base.label='Marcado HECHO';base.reason='El Excel indica HECHO. No se reserva stock para esta línea.';return base}
+     if(!code||!lot||!Number.isFinite(charge)||charge<=0){base.reason='Falta código, lote o una cantidad de carga válida y mayor que cero.';return base}
+     if(!origin){base.reason='Sin ubicación origen: no se asigna stock automáticamente.';return base}
+     const matching=(byCode.get(code)||[]).filter(m=>m.lotInternal===lot||m.lotSupplier===lot);
+     if(!matching.length){base.kind='nostock';base.label='Sin stock coincidente';base.shortfall=charge;base.reason='Sin coincidencia exacta de artículo y lote en el maestro.';return base}
+     const inLocation=matching.filter(m=>m.location===origin);
+     if(!inLocation.length){base.kind='location';base.label='Otra ubicación';base.shortfall=charge;base.reason='Existe artículo y lote en el maestro, pero no en la ubicación origen indicada.';base.stocks=matching;base.statuses=[...new Set(matching.map(m=>m.status))];return base}
+     base.stocks=inLocation;base.statuses=[...new Set(inLocation.map(m=>m.status))];
+     let need=charge;
+     for(const m of inLocation){if(need<=0)break;const take=Math.min(need,m.remaining);m.remaining-=take;need-=take;base.assigned+=take}
+     base.shortfall=Math.max(0,need);
+     if(base.assigned>=charge-1e-8){base.kind='coverage';base.label='Cobertura suficiente';base.reason='Cantidad cubierta según el maestro. Verificar código de estado, unidad, proyecto y restricciones BaaN.'}
+     else if(base.assigned>0){base.kind='partial';base.label='Cobertura parcial';base.reason='Stock coincidente insuficiente tras asignar previamente otras líneas de carga.'}
+     else{base.kind='nostock';base.label='Sin stock disponible';base.reason='El saldo coincidente ya se ha asignado a otras líneas, o es cero.'}
+     return base;
+   });
+   paint();
+ }
+ const names={coverage:'Cobertura suficiente',partial:'Cobertura parcial',nostock:'Sin stock',location:'Otra ubicación',review:'Revisión necesaria',done:'Marcado HECHO'};
+ function paint(){
+   const term=canonical(el('stockSearch').value),type=el('stockFilter').value;
+   display=results.filter(x=>(type==='all'||x.kind===type)&&(!term||[x.code,x.r[6],x.lot,x.of,x.origin,x.r[0]].some(v=>canonical(v).includes(term))));
+   const counts={coverage:0,partial:0,nostock:0,location:0,review:0,done:0};display.forEach(x=>counts[x.kind]++);
+   el('stockSummary').innerHTML=[['Líneas visibles',display.length],['Cobertura suficiente',counts.coverage],['Cobertura parcial',counts.partial],['Sin stock',counts.nostock],['Por verificar / ubicación',counts.review+counts.location]].map(([k,v])=>`<div><small>${safe(k)}</small><strong>${fmt(v)}</strong></div>`).join('');
+   el('stockRows').innerHTML=display.length?display.slice(0,1200).map(x=>`<tr><td><span class="sbadge ${x.kind}">${safe(x.label)}</span></td><td>${safe(x.code)}</td><td>${safe(x.r[6])}</td><td>${safe(x.lot)}</td><td>${safe(x.of)}</td><td>${safe(x.origin)}</td><td>${fmt(x.requested)}</td><td>${fmt(x.assigned)}</td><td>${fmt(x.shortfall)}</td><td>${safe(x.stocks.map(s=>`${s.location}: ${fmt(s.amount)} ${s.unit}`).join(' · '))||'—'}</td><td>${safe(x.statuses.join(', '))||'—'}</td><td>${safe(x.reason)}</td></tr>`).join(''):`<tr><td colspan="12">${master.length&&records.length?'No hay líneas para los filtros seleccionados.':'Importa ambos Excel para comparar el stock.'}</td></tr>`;
+   el('stockFoot').textContent=`${display.length} resultados · Se muestran hasta 1.200 filas en pantalla. Los movimientos HECHO y las devoluciones no consumen stock en esta simulación. El cálculo asigna stock a las líneas en el orden del Excel; no sustituye las validaciones de BaaN ni la hoja de composición.`;
+ }
+ function csv(){const rows=[['Hoja','Fila','Estado','Artículo','Descripción','Lote','OF','Origen','Cantidad carga','Asignada','Faltante','Estados BaaN','Detalle'],...display.map(x=>[x.r[0],x.r[1],x.label,x.code,x.r[6],x.lot,x.of,x.origin,x.requested,x.assigned,x.shortfall,x.statuses.join('/'),x.reason])];const data='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');const url=URL.createObjectURL(new Blob([data],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='comprobacion_disponibilidad.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)}
+ function open(){el('stockpanel').hidden=false;el('tabstock').classList.add('active');el('taball').classList.remove('active');el('tabof').classList.remove('active');el('tabfast').classList.remove('active');el('fastpanel').hidden=true;recalc();el('stockpanel').scrollIntoView({block:'start',behavior:'smooth'})}
+ function close(){el('stockpanel').hidden=true;el('tabstock').classList.remove('active');el('taball').classList.toggle('active',activeView==='all');el('tabof').classList.toggle('active',activeView==='of')}
+ el('tabstock').onclick=open;el('stockExit').onclick=close;el('stockMasterBtn').onclick=()=>el('stockMasterFile').click();el('stockMasterFile').onchange=e=>{const f=e.target.files?.[0];if(f)importMaster(f)};el('stockLoadBtn').onclick=()=>el('file').click();el('stockSearch').oninput=paint;el('stockFilter').onchange=paint;el('stockExport').onclick=csv;
+ document.addEventListener('almacen:cargas-actualizadas',recalc);
+ ['taball','tabof','tabfast'].forEach(id=>el(id).addEventListener('click',close));
+ recalc();
+})();
+
 </script>
  </body>
 </html>
